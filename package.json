@@ -1,0 +1,35 @@
+{
+  "name": "v3-pro",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init",
+    "db:seed": "node prisma/seed.js",
+    "search:reindex": "node scripts/reindex.js",
+    "lint": "echo 'Add ESLint if you want'"
+  },
+  "dependencies": {
+    "@prisma/client": "5.13.0",
+    "@aws-sdk/client-s3": "^3.637.0",
+    "formidable": "^3.5.0",
+    "meilisearch": "^0.37.0",
+    "next": "14.1.0",
+    "next-auth": "^4.24.7",
+    "next-connect": "^0.13.0",
+    "rate-limiter-flexible": "^2.4.2",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "zod": "^3.23.8",
+    "slugify": "^1.6.6",
+    "jsonld": "^8.3.2",
+    "swr": "^2.2.5"
+  },
+  "devDependencies": {
+    "prisma": "5.13.0",
+    "dotenv-cli": "^7.4.1"
+  }
+}

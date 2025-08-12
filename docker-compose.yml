@@ -1,0 +1,33 @@
+
+version: "3.9"
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: v3
+      POSTGRES_PASSWORD: v3
+      POSTGRES_DB: v3pro
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  search:
+    image: getmeili/meilisearch:v1.10
+    environment:
+      MEILI_MASTER_KEY: masterKey
+    ports:
+      - "7700:7700"
+  app:
+    build: .
+    depends_on: [db, search]
+    environment:
+      DATABASE_URL: postgresql://v3:v3@db:5432/v3pro?schema=public
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: dev-dev-dev
+      MEILI_HOST: http://search:7700
+      MEILI_MASTER_KEY: masterKey
+      STORAGE: local
+    ports:
+      - "3000:3000"
+volumes:
+  pgdata:
