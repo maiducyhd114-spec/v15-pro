@@ -1,4 +1,8 @@
 
+export async function getServerSideProps() {
+  return { props: {} };
+}
+
 import { useState } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 
