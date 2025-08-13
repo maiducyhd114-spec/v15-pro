@@ -1,0 +1,12 @@
+const fs = require('fs');
+const p = JSON.parse(fs.readFileSync('package.json','utf8'));
+p.scripts = p.scripts || {};
+p.scripts["vercel-build"]="npx prisma generate && next build";
+p.scripts["env:pull"]="vercel env pull .env.production";
+p.scripts["key:auth"]="node -e \"console.log(require('crypto').randomBytes(32).toString('base64'))\"";
+p.scripts["key:health"]="node -e \"console.log(require('crypto').randomBytes(24).toString('hex'))\"";
+p.scripts["keys:setup:prod"]="AUTH=$(npm run -s key:auth) && HEALTH=$(npm run -s key:health) && vercel env add NEXTAUTH_SECRET production <<< \\\"$AUTH\\\" && vercel env add NEXTAUTH_SECRET preview <<< \\\"$AUTH\\\" && vercel env add HEALTH_KEY production <<< \\\"$HEALTH\\\" && vercel env add HEALTH_KEY preview <<< \\\"$HEALTH\\\" && vercel --prod --force";
+p.scripts["keys:rotate:health"]="HEALTH=$(npm run -s key:health) && vercel env rm HEALTH_KEY production --yes && vercel env rm HEALTH_KEY preview --yes && vercel env add HEALTH_KEY production <<< \\\"$HEALTH\\\" && vercel env add HEALTH_KEY preview <<< \\\"$HEALTH\\\" && vercel --prod --force";
+p.scripts["keys:show"]="vercel env pull .env.production >/dev/null && sed -n 's/^\\(NEXTAUTH_SECRET\\|HEALTH_KEY\\)=.*/\\0/p' .env.production";
+p.scripts["health:url"]="vercel env pull .env.production >/dev/null && node -e \\\"const fs=require('fs');const u=(process.env.NEXTAUTH_URL||'https://v15-pro.vercel.app').replace(/\\\\/$/,'');const m=fs.readFileSync('.env.production','utf8').match(/HEALTH_KEY=(.*)/);console.log(u+'/api/health?key='+(m?m[1].trim():''))\\\"";
+fs.writeFileSync('package.json', JSON.stringify(p, null, 2));

@@ -11,7 +11,14 @@
     "db:seed": "node prisma/seed.js",
     "search:reindex": "node scripts/reindex.js",
     "lint": "echo 'Add ESLint if you want'",
-    "vercel-build": "npx prisma generate && next build"
+    "vercel-build": "npx prisma generate && next build",
+    "env:pull": "vercel env pull .env.production",
+    "key:auth": "node -e \"console.log(require('crypto').randomBytes(32).toString('base64'))\"",
+    "key:health": "node -e \"console.log(require('crypto').randomBytes(24).toString('hex'))\"",
+    "keys:setup:prod": "AUTH=$(npm run -s key:auth) && HEALTH=$(npm run -s key:health) && vercel env add NEXTAUTH_SECRET production <<< \\\"$AUTH\\\" && vercel env add NEXTAUTH_SECRET preview <<< \\\"$AUTH\\\" && vercel env add HEALTH_KEY production <<< \\\"$HEALTH\\\" && vercel env add HEALTH_KEY preview <<< \\\"$HEALTH\\\" && vercel --prod --force",
+    "keys:rotate:health": "HEALTH=$(npm run -s key:health) && vercel env rm HEALTH_KEY production --yes && vercel env rm HEALTH_KEY preview --yes && vercel env add HEALTH_KEY production <<< \\\"$HEALTH\\\" && vercel env add HEALTH_KEY preview <<< \\\"$HEALTH\\\" && vercel --prod --force",
+    "keys:show": "vercel env pull .env.production >/dev/null && sed -n 's/^\\(NEXTAUTH_SECRET\\|HEALTH_KEY\\)=.*/\\0/p' .env.production",
+    "health:url": "vercel env pull .env.production >/dev/null && node -e \\\"const fs=require('fs');const u=(process.env.NEXTAUTH_URL||'https://v15-pro.vercel.app').replace(/\\\\/$/,'');const m=fs.readFileSync('.env.production','utf8').match(/HEALTH_KEY=(.*)/);console.log(u+'/api/health?key='+(m?m[1].trim():''))\\\""
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.637.0",
